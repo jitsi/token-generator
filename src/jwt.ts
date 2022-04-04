@@ -1,9 +1,11 @@
-
+// @TODO: implement all this parts of the token: https://developer.8x8.com/jaas/docs/api-keys-jwt
 import * as dotenv from 'dotenv';
 import envalid from 'envalid';
 import fs from 'fs';
 
-import AsapRequest from './asap_request';
+import { Context } from './context';
+import logger from './logger';
+import TokenGenerator from './token_generator';
 
 dotenv.config();
 
@@ -11,16 +13,51 @@ const env = envalid.cleanEnv(process.env, {
     ASAP_JWT_ISS: envalid.str({ default: 'jitsi-token-generator' }),
     ASAP_JWT_AUD: envalid.str({ default: 'jitsi' }),
     ASAP_SIGNING_KEY_FILE: envalid.str(),
-    ASAP_JWT_KID: envalid.str()
+    ASAP_JWT_KID: envalid.str(),
+    ASAP_TYPE: envalid.str({ default: '' }),
+    ASAP_JWT_SUB: envalid.str({ default: undefined }),
+    ASAP_ROOM: envalid.str({ default: '' })
 });
 
 const jwtSigningKey = fs.readFileSync(env.ASAP_SIGNING_KEY_FILE);
 
-const asapRequest = new AsapRequest({
+const tokenGenerator = new TokenGenerator({
     signingKey: jwtSigningKey,
     asapJwtIss: env.ASAP_JWT_ISS,
     asapJwtAud: env.ASAP_JWT_AUD,
-    asapJwtKid: env.ASAP_JWT_KID
+    asapJwtKid: env.ASAP_JWT_KID,
+    asapJwtSub: env.ASAP_JWT_SUB
 });
 
-console.log(asapRequest.authToken());
+const ctx = new Context(logger, 0, '');
+
+let token = '';
+
+let asapType = 'server';
+
+if (env.ASAP_TYPE) {
+    asapType = <string>env.ASAP_TYPE
+}
+
+switch (asapType) {
+case 'server':
+    token = tokenGenerator.serverToken(ctx, {})
+    break;
+case 'client':
+    token = tokenGenerator.clientToken(ctx, env.ASAP_ROOM ? env.ASAP_ROOM : '*', { expiresIn: '1 day' });
+    break;
+case 'component':
+    token = tokenGenerator.clientToken(ctx,
+        env.ASAP_ROOM ? env.ASAP_ROOM : '*',
+        {
+            audience: 'jitsi-component',
+            expiresIn: '1 day',
+            subject: '*'
+        }
+    );
+    break;
+default:
+    token = 'wtfbbq';
+    break;
+}
+console.log(token);
