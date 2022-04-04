@@ -1,0 +1,62 @@
+{
+    "name": "jitsi-token-generator",
+    "version": "1.0.0",
+    "description": "JWT tokens for all occasions",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "concurrently -k -p \"[{name}]\" \"npm run watch-ts\" \"npm run watch-node\"",
+        "watch-ts": "tsc -w",
+        "watch-node": "nodemon dist/app.js",
+        "lint": "npx eslint . --ext .ts,.tsx --fix",
+        "build": "npm run lint && tsc",
+        "start": "node dist/app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jitsi/token-generator"
+    },
+    "keywords": [],
+    "author": "Jitsi",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/jitsi/token-generator/issues"
+    },
+    "homepage": "https://github.com/jitsi/token-generator#readme",
+    "devDependencies": {
+        "@babel/eslint-parser": "^7.17.0",
+        "@jitsi/eslint-config": "^4.1.1",
+        "@jitsi/logger": "2.0.1",
+        "@types/express": "^4.17.1",
+        "@types/jsonwebtoken": "^8.5.0",
+        "@types/node-cache": "^4.2.5",
+        "@types/redlock": "^4.0.1",
+        "@types/sha256": "^0.2.0",
+        "@typescript-eslint/eslint-plugin": "^5.10.0",
+        "@typescript-eslint/parser": "^5.10.0",
+        "eslint": "^8.7.0",
+        "eslint-plugin-import": "^2.25.4",
+        "eslint-plugin-react": "^7.28.0",
+        "nodemon": "^2.0.4",
+        "prettier": "^2.0.5",
+        "typescript": "^3.9.7"
+    },
+    "dependencies": {
+        "@types/shortid": "0.0.29",
+        "@types/sshpk": "^1.10.4",
+        "dotenv": "^8.2.0",
+        "envalid": "^6.0.2",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "express": "^4.17.1",
+        "express-validator": "^6.6.1",
+        "got": "^11.5.1",
+        "jsonwebtoken": "^8.5.1",
+        "node-cache": "^5.1.2",
+        "prom-client": "^12.0.0",
+        "redlock": "^4.1.0",
+        "sha256": "^0.2.0",
+        "shortid": "^2.2.15",
+        "socket.io-client": "^3.1.0"
+    }
+}
