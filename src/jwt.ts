@@ -3,9 +3,9 @@ import * as dotenv from 'dotenv';
 import envalid from 'envalid';
 import fs from 'fs';
 
-import { Context } from './context';
 import logger from './logger';
 import TokenGenerator from './token_generator';
+import { Context } from './util/context';
 
 dotenv.config();
 
@@ -44,11 +44,11 @@ case 'server':
     token = tokenGenerator.serverToken(ctx, {})
     break;
 case 'client':
-    token = tokenGenerator.clientToken(ctx, env.ASAP_ROOM ? env.ASAP_ROOM : '*', { expiresIn: '1 day' });
+    token = tokenGenerator.clientToken(ctx, { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
     break;
 case 'component':
     token = tokenGenerator.clientToken(ctx,
-        env.ASAP_ROOM ? env.ASAP_ROOM : '*',
+        { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' },
         {
             audience: 'jitsi-component',
             expiresIn: '1 day',

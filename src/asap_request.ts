@@ -2,7 +2,7 @@ import got, { CancelableRequest } from 'got';
 import { sign } from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 
-import { Context } from './context';
+import { Context } from './util/context';
 
 export interface AsapRequestOptions {
     signingKey: Buffer;
