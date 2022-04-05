@@ -49,28 +49,22 @@ class Handlers {
         }
 
         const signOptions = <SignOptions>{
-            audience: 'jitsi-component',
+            issuer: 'jaas-components',
             expiresIn: '1 day'
         }
 
         if (inputs.tenant) {
             signOptions.subject = inputs.tenant;
+        } else if (inputs.domain) {
+            signOptions.subject = inputs.domain;
         } else {
             signOptions.subject = '*'
-        }
-
-        if (inputs.domain) {
-            signOptions.audience = inputs.domain;
         }
 
         switch (inputs.tokenType) {
         case 'JIGASI':
             // inject any jigasi specifics here
-            payload.context = {
-                user: {
-                    'name': 'jigasi'
-                }
-            }
+            signOptions.audience = `jigasi.${inputs.domain}`;
             break;
         }
 
