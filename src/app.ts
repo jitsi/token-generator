@@ -6,7 +6,6 @@ import express from 'express';
 import config from './config';
 import logger from './logger';
 
-// const jwtSigningKey = fs.readFileSync(config.AsapSigningKeyFile);
 const app = express();
 
 logger.info(`Starting up jitsi-component-sidecar service with config: ${JSON.stringify(config)}`);
