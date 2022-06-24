@@ -1,8 +1,8 @@
 // import got, { CancelableRequest } from 'got';
-import { sign, SignOptions } from 'jsonwebtoken';
+import { JwtPayload, sign, SignOptions } from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 
-import { Context } from './context';
+import { Context } from './util/context';
 
 interface Claims {
     [key: string]: string;
@@ -97,8 +97,8 @@ export default class TokenGenerator {
      * @param options SignOptions
      * @returns string for client auth
      */
-    clientToken(ctx: Context, room = '*', options: SignOptions = {}): string {
-        return this.signJWT(ctx, { room }, options);
+    clientToken(ctx: Context, payload: JwtPayload, options: SignOptions = {}): string {
+        return this.signJWT(ctx, payload, options);
     }
 
     /**
