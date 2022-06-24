@@ -55,7 +55,6 @@ const tokenGenerator = new TokenGenerator({
 
 const handlers = new Handlers({ tokenGenerator });
 
-// const jwtSigningKey = fs.readFileSync(config.AsapSigningKeyFile);
 const app = express();
 
 app.use(bodyParser.json());
