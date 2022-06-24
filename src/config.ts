@@ -16,75 +16,52 @@ if (result.error) {
     }
 }
 
+/**
+ * Maps a public key base URL to a kidPattern, if any
+ */
+export interface AsapBaseUrlMapping {
+    appendKidPrefix: boolean;
+    baseUrl: string;
+    kid?: string,
+}
+
 const env = envalid.cleanEnv(process.env, {
+    ASAP_JWT_AUD: envalid.str({ default: 'jitsi' }),
+    ASAP_JWT_ISS: envalid.str({ default: 'jitsi-token-generator' }),
+    ASAP_JWT_KID: envalid.str(),
+    ASAP_JWT_SUB: envalid.str({ default: undefined }),
+    ASAP_PUB_KEY_TTL: envalid.num({ default: 3600 }),
+    ASAP_SIGNING_KEY_FILE: envalid.str(),
+    HOSTNAME: envalid.str({ default: '' }),
+    KEY_PREFIX_PATTERN: envalid.str({ default: '^(.*)/(.*)$' }),
     LOG_LEVEL: envalid.str({ default: 'info' }),
     PORT: envalid.num({ default: 8017 }),
-    WS_SERVER_URL: envalid.str({ default: 'ws://localhost:8015' }),
-    WS_SERVER_PATH: envalid.str({ default: '/jitsi-component-selector/ws' }),
-    ASAP_SIGNING_KEY_FILE: envalid.str(),
-    ASAP_JWT_KID: envalid.str({ default: '' }),
-    ASAP_JWT_ISS: envalid.str({ default: 'jitsi-component-sidecar' }),
-    ASAP_JWT_AUD: envalid.str({ default: 'jitsi-component-selector' }),
-    REQUEST_TIMEOUT_MS: envalid.num({ default: 8000 }),
+    PROTECTED_API: envalid.bool({ default: true }),
     REQUEST_RETRY_COUNT: envalid.num({ default: 2 }),
-    START_REQUEST_TIMEOUT_MS: envalid.num({ default: 30000 }),
-    STATS_POLLING_INTERVAL: envalid.num({ default: 30 }),
-    STATS_REPORTING_INTERVAL: envalid.num({ default: 30 }),
-    STATS_RETRIEVE_URL: envalid.str({
-        default: ''
-    }),
-    START_INSTANCE_URL: envalid.str({
-        default: ''
-    }),
-    STOP_INSTANCE_URL: envalid.str({
-        default: ''
-    }),
-    ENABLE_STOP_INSTANCE: envalid.bool({ default: true }),
-    ENVIRONMENT: envalid.str(),
-    REGION: envalid.str(),
-    COMPONENT_TYPE: envalid.str(),
-    INSTANCE_KEY: envalid.str(),
-    INSTANCE_NICK: envalid.str({ default: 'jibri' }),
-    INSTANCE_METADATA: envalid.json({ default: '{}' }),
-    INSTANCE_ID: envalid.str({ default: '' }),
-    HOSTNAME: envalid.str({ default: '' }),
-    VOLATILE_EVENTS: envalid.bool({ default: true }),
-    SIP_CLIENT_USERNAME: envalid.str({ default: '' }),
-    SIP_CLIENT_PASSWORD: envalid.str({ default: '' })
+    REQUEST_TIMEOUT_MS: envalid.num({ default: 8000 }),
+    SYSTEM_ASAP_BASE_URL_MAPPINGS: envalid.json(
+        { example:
+            '[{"kid": "kidPattern", baseUrl": "https://jaas-public-keys.jitsi.net/server/dev"}]'
+        }),
+    SYSTEM_ASAP_JWT_ACCEPTED_HOOK_ISS: envalid.str(),
+    SYSTEM_ASAP_JWT_AUD: envalid.str()
 });
 
 export default {
-    LogLevel: env.LOG_LEVEL,
-    HTTPServerPort: env.PORT,
-    WSServerUrl: env.WS_SERVER_URL,
-    WSServerPath: env.WS_SERVER_PATH,
-    AsapSigningKeyFile: env.ASAP_SIGNING_KEY_FILE,
-    AsapJwtKid: env.ASAP_JWT_KID,
-    AsapJwtIss: env.ASAP_JWT_ISS,
     AsapJwtAud: env.ASAP_JWT_AUD,
-    RequestTimeoutMs: env.REQUEST_TIMEOUT_MS,
-    RequestRetryCount: env.REQUEST_RETRY_COUNT,
-    StartRequestTimeoutMs: env.START_REQUEST_TIMEOUT_MS,
-
-    // number of seconds to wait before polling for stats
-    StatsPollingInterval: env.STATS_POLLING_INTERVAL,
-
-    // number of seconds to wait before reporting stats
-    StatsReportingInterval: env.STATS_REPORTING_INTERVAL,
-    StatsRetrieveURL: env.STATS_RETRIEVE_URL,
-    StartComponentURL: env.START_INSTANCE_URL,
-    StopComponentURL: env.STOP_INSTANCE_URL,
-    EnableStopComponent: env.ENABLE_STOP_INSTANCE,
-    Environment: env.ENVIRONMENT,
-    Region: env.REGION,
-    ComponentType: env.COMPONENT_TYPE,
-    ComponentKey: env.INSTANCE_KEY,
-    ComponentNick: env.INSTANCE_NICK,
-    ComponentMetadata: env.INSTANCE_METADATA,
-    ComponentId: env.INSTANCE_ID,
-    ComponentGroup: env.INSTANCE_GROUP,
+    AsapJwtIss: env.ASAP_JWT_ISS,
+    AsapJwtKid: env.ASAP_JWT_KID,
+    AsapJwtSub: env.ASAP_JWT_SUB,
+    AsapPubKeyTTL: env.ASAP_PUB_KEY_TTL,
+    AsapSigningKeyFile: env.ASAP_SIGNING_KEY_FILE,
+    HTTPServerPort: env.PORT,
     Hostname: env.HOSTNAME,
-    VolatileEvents: env.VOLATILE_EVENTS,
-    SipClientUserName: env.SIP_CLIENT_USERNAME,
-    SipClientPassword: env.SIP_CLIENT_PASSWORD
+    KidPrefixPattern: env.KEY_PREFIX_PATTERN,
+    LogLevel: env.LOG_LEVEL,
+    ProtectedApi: env.PROTECTED_API,
+    RequestRetryCount: env.REQUEST_RETRY_COUNT,
+    RequestTimeoutMs: env.REQUEST_TIMEOUT_MS,
+    SystemAsapBaseUrlMappings: env.SYSTEM_ASAP_BASE_URL_MAPPINGS,
+    SystemAsapJwtAcceptedAud: env.SYSTEM_ASAP_JWT_AUD,
+    SystemAsapJwtAcceptedHookIss: env.SYSTEM_ASAP_JWT_ACCEPTED_HOOK_ISS.split(',')
 };
