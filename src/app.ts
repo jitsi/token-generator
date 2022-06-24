@@ -53,7 +53,7 @@ const tokenGenerator = new TokenGenerator({
     asapJwtSub: config.AsapJwtSub
 });
 
-const h = new Handlers({ tokenGenerator });
+const handlers = new Handlers({ tokenGenerator });
 
 // const jwtSigningKey = fs.readFileSync(config.AsapSigningKeyFile);
 const app = express();
@@ -61,7 +61,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.json());
 app.use('/', context.injectContext);
-
 
 logger.info(`Starting up jitsi-token-generator service with config: ${JSON.stringify(config)}`);
 
@@ -78,7 +77,7 @@ app.use(errorHandler.errorHandlerMiddleware);
 
 app.get('/generate/component', async (req: Request, res: Response, next) => {
     try {
-        await h.generateComponentToken(req, res);
+        await handlers.generateComponentToken(req, res);
     } catch (err) {
         next(err);
     }
@@ -86,14 +85,14 @@ app.get('/generate/component', async (req: Request, res: Response, next) => {
 
 app.get('/generate/server', async (req: Request, res: Response, next) => {
     try {
-        await h.generateServerToken(req, res);
+        await handlers.generateServerToken(req, res);
     } catch (err) {
         next(err);
     }
 });
 app.post('/generate/component', async (req: Request, res: Response, next) => {
     try {
-        await h.generateComponentToken(req, res);
+        await handlers.generateComponentToken(req, res);
     } catch (err) {
         next(err);
     }
@@ -101,7 +100,7 @@ app.post('/generate/component', async (req: Request, res: Response, next) => {
 
 app.post('/generate/server', async (req: Request, res: Response, next) => {
     try {
-        await h.generateServerToken(req, res);
+        await handlers.generateServerToken(req, res);
     } catch (err) {
         next(err);
     }
