@@ -57,6 +57,10 @@ const handlers = new Handlers({ tokenGenerator });
 
 const app = express();
 
+app.get('/health', (req: express.Request, res: express.Response) => {
+    res.send('OK');
+});
+
 app.use(bodyParser.json());
 app.use(express.json());
 app.use('/', context.injectContext);
