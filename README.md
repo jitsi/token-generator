@@ -5,7 +5,7 @@ Token Generator for all occasions
 
 First generate the private key with the following command:
 
-`openssl genrsa 2048 -out jwtRSA256-private.pem`
+`openssl genrsa 4096 -out jwtRSA256-private.pem`
 
 Next extract the public key in PEM format with the following command:
 
@@ -17,4 +17,4 @@ Decide on a unique `kid` name for the key, like `jitsi/jwt-2020-01-01` and calcu
 
 Place the public key into appropriate the asap keys folder on the nginx server, named for like `<sha256sum>.pem`, for example:
 
-`asap_keys/components/8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52.pem`
+`cp jwtRSA256-public.pem <nginx_root>asap_keys/components/8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52.pem`
