@@ -18,7 +18,7 @@ const env = envalid.cleanEnv(process.env, {
     ASAP_TYPE: envalid.str({ default: '' }),
     ASAP_JWT_SUB: envalid.str({ default: undefined }),
     ASAP_ROOM: envalid.str({ default: '' }),
-    ASAP_SCD: envalid.str({ default: undefined })  // cluster scope domain
+    ASAP_SCD: envalid.str({ default: undefined }) // cluster scope domain
 });
 
 const jwtSigningKey = fs.readFileSync(env.ASAP_SIGNING_KEY_FILE);
