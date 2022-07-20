@@ -42,12 +42,11 @@ if (env.ASAP_TYPE) {
 
 switch (asapType) {
 case 'server':
+    const payload = <JwtPayload>{};
     if (env.ASAP_SCD) {
-        token = tokenGenerator.serverToken(ctx, { scd: env.ASAP_SCD });
-
-    } else {
-        token = tokenGenerator.serverToken(ctx);
+        payload.scd = env.ASAP_SCD
     }
+    token = tokenGenerator.serverToken(ctx, payload, {});
     break;
 case 'client':
     token = tokenGenerator.clientToken(ctx, { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
