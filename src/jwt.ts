@@ -43,10 +43,10 @@ if (env.ASAP_TYPE) {
 switch (asapType) {
 case 'server':
     if (env.ASAP_SCD) {
-        token = tokenGenerator.serverToken(ctx, { scd: env.ASAP_SCD }, {});
+        token = tokenGenerator.serverToken(ctx, { scd: env.ASAP_SCD });
 
     } else {
-        token = tokenGenerator.serverToken(ctx, {}, {});
+        token = tokenGenerator.serverToken(ctx);
     }
     break;
 case 'client':
