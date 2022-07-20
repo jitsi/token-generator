@@ -6,6 +6,7 @@ import fs from 'fs';
 import logger from './logger';
 import TokenGenerator from './token_generator';
 import { Context } from './util/context';
+import { JwtPayload } from 'jsonwebtoken';
 
 dotenv.config();
 
