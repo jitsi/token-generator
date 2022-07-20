@@ -72,8 +72,13 @@ export default class TokenGenerator {
     }
 
     /**
+     *
+     * @param ctx Context
+     * @param payload JWT claims
+     * @param options ASAP signing options
+     * @returns string for server auth
      */
-    serverToken(ctx: Context, options: SignOptions): string {
+    serverToken(ctx: Context, payload: JwtPayload = {}, options: SignOptions = {}): string {
         // const cacheKey = 'asap_server';
         // const cachedAuth: string = this.asapCache.get(cacheKey);
 
@@ -83,7 +88,7 @@ export default class TokenGenerator {
 
         ctx.logger.debug('serverToken generation');
 
-        const auth = this.signJWT(ctx, {}, options);
+        const auth = this.signJWT(ctx, payload, options);
 
         // this.asapCache.set(cacheKey, auth);
 
@@ -93,8 +98,8 @@ export default class TokenGenerator {
     /**
      *
      * @param ctx Context
-     * @param room string
-     * @param options SignOptions
+     * @param payload JWT claims
+     * @param options ASAP signing options
      * @returns string for client auth
      */
     clientToken(ctx: Context, payload: JwtPayload, options: SignOptions = {}): string {

@@ -6,6 +6,7 @@ import fs from 'fs';
 import logger from './logger';
 import TokenGenerator from './token_generator';
 import { Context } from './util/context';
+import { JwtPayload } from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -16,7 +17,8 @@ const env = envalid.cleanEnv(process.env, {
     ASAP_JWT_KID: envalid.str(),
     ASAP_TYPE: envalid.str({ default: '' }),
     ASAP_JWT_SUB: envalid.str({ default: undefined }),
-    ASAP_ROOM: envalid.str({ default: '' })
+    ASAP_ROOM: envalid.str({ default: '' }),
+    ASAP_SCD: envalid.str({ default: undefined }) // cluster scope domain
 });
 
 const jwtSigningKey = fs.readFileSync(env.ASAP_SIGNING_KEY_FILE);
@@ -39,9 +41,14 @@ if (env.ASAP_TYPE) {
     asapType = <string>env.ASAP_TYPE
 }
 
+const payload = <JwtPayload>{};
+
 switch (asapType) {
 case 'server':
-    token = tokenGenerator.serverToken(ctx, {})
+    if (env.ASAP_SCD) {
+        payload.scd = env.ASAP_SCD
+    }
+    token = tokenGenerator.serverToken(ctx, payload, {});
     break;
 case 'client':
     token = tokenGenerator.clientToken(ctx, { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
