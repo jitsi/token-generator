@@ -41,9 +41,10 @@ if (env.ASAP_TYPE) {
     asapType = <string>env.ASAP_TYPE
 }
 
+const payload = <JwtPayload>{};
+
 switch (asapType) {
 case 'server':
-    const payload = <JwtPayload>{};
     if (env.ASAP_SCD) {
         payload.scd = env.ASAP_SCD
     }
