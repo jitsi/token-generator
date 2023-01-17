@@ -63,6 +63,7 @@ export class ASAPPubKeyFetcher {
             this.cache.set(token.header.kid, pubKey);
         } catch (err) {
             ctx.logger.error(`Obtaining asap pub ${err}`, { err });
+            throw err;
         }
 
         return pubKey;
