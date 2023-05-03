@@ -1,8 +1,7 @@
 
 import express from 'express';
-import { secretType } from 'express-jwt';
 import got from 'got';
-import { Secret } from 'jsonwebtoken';
+import { Jwt, Secret, JwtPayload } from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import sha256 from 'sha256';
 
@@ -32,6 +31,7 @@ export class ASAPPubKeyFetcher {
         this.issToBaseUrl = issToBaseUrl;
         this.cache = new NodeCache({ stdTTL: ttl });
         this.kidPrefixPattern = kidPrefixPattern;
+
         this.pubKeyCallback = this.pubKeyCallback.bind(this);
         this.pubKeyCallbackForJsonWebToken = this.pubKeyCallbackForJsonWebToken.bind(this);
     }
@@ -39,52 +39,34 @@ export class ASAPPubKeyFetcher {
     /**
      * Method for getting the public key
      * @param ctx
-     * @param header
-     * @param payload
-     * @param done
+     * @param token Jwt token details from jsonwebtoken
      */
-    pubKeyCallbackForJsonWebToken(ctx: Context,
-            header: any,
-            payload: any,
-            done: (err: any, secret?: secretType | Secret) => void): void {
-        try {
-            if (!header || !header.kid) {
-                done(new Error('kid is required in header'), null);
-
-                return;
-            }
-            const kid = header.kid;
-            const pubKey: string = this.cache.get(kid);
-
-            if (pubKey) {
-                ctx.logger.debug('Using pub key from cache');
-                done(null, pubKey);
-
-                return;
-            }
-
-            const issuer = payload.iss;
-            const baseUrl = this.getPublicKeyUrl(ctx, kid, this.issToBaseUrl.get(issuer));
-
-            if (!baseUrl) {
-                done(new Error('invalid issuer or kid'), null);
-
-                return;
-            }
-
-            ctx.logger.debug('Fetching pub key from key server');
-            fetchPublicKey(baseUrl, kid)
-                .then(key => {
-                    this.cache.set(kid, key);
-                    done(null, key);
-                })
-                .catch(err => {
-                    ctx.logger.error(`Obtaining asap pub ${err}`);
-                    done(err);
-                });
-        } catch (err) {
-            done(err);
+    async pubKeyCallbackForJsonWebToken(ctx: Context, token: Jwt): Promise<Secret> {
+        if (!token.header.kid) {
+            throw new Error('kid is required in header');
         }
+
+        let pubKey = <Secret> this.cache.get(token.header.kid);
+
+        ctx.logger.debug('fetching pub key from key server');
+        const payload = <JwtPayload>token.payload;
+        const issuer = payload.iss;
+        const baseUrl = this.getPublicKeyUrl(ctx, token.header.kid, this.issToBaseUrl.get(issuer));
+
+        if (!baseUrl) {
+            throw new Error('invalid issuer or kid');
+        }
+
+        ctx.logger.debug('Fetching pub key from key server');
+        try {
+            pubKey = <Secret> await fetchPublicKey(baseUrl, token.header.kid);
+            this.cache.set(token.header.kid, pubKey);
+        } catch (err) {
+            ctx.logger.error(`Obtaining asap pub ${err}`, { err });
+            throw err;
+        }
+
+        return pubKey;
     }
 
     /**
@@ -134,15 +116,10 @@ export class ASAPPubKeyFetcher {
      * Method for getting the public key, using a signature
      * specific to express-jwt
      * @param req
-     * @param header
-     * @param payload
-     * @param done
+     * @param token JWT from jsonwebtoken
      */
-    pubKeyCallback(req: express.Request,
-            header: any,
-            payload: any,
-            done: (err: any, secret?: secretType) => void): void {
-        return this.pubKeyCallbackForJsonWebToken(req.context, header, payload, done);
+    async pubKeyCallback(req: express.Request, token: Jwt): Promise<Secret> {
+        return this.pubKeyCallbackForJsonWebToken(req.context, token);
     }
 }
 

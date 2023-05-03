@@ -1,5 +1,5 @@
 import express from 'express';
-import jwt, { UnauthorizedError } from 'express-jwt';
+import { expressjwt, UnauthorizedError } from 'express-jwt';
 
 import { ASAPPubKeyFetcher } from '../util/asap';
 
@@ -92,7 +92,7 @@ export class GeneratorAuthorization {
      */
     private authorize(req: express.Request, res: express.Response, next: express.NextFunction, jwtClaims: JwtClaims) {
         try {
-            jwt({
+            expressjwt({
                 secret: this.asapFetcher.pubKeyCallback,
                 audience: jwtClaims.asapJwtAcceptedAud,
                 issuer: jwtClaims.asapJwtAcceptedHookIss,
