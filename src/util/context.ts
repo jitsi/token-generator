@@ -1,5 +1,5 @@
 import * as jitsiLogger from '@jitsi/logger';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import shortid from 'shortid';
 
 
@@ -39,7 +39,7 @@ export function generateNewContext(contextId?: string): Context {
     if (!resultedContextId) {
         resultedContextId = shortid.generate();
     }
-    const ctxLogger = jitsiLogger.getUntrackedLogger(resultedContextId, undefined, {})
+    const ctxLogger = jitsiLogger.getUntrackedLogger(resultedContextId, undefined, {});
 
     return new Context(ctxLogger, start, resultedContextId);
 }

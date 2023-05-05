@@ -1,5 +1,5 @@
 // import got, { CancelableRequest } from 'got';
-import { JwtPayload, sign, SignOptions } from 'jsonwebtoken';
+import { JwtPayload, SignOptions, sign } from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 
 import { Context } from './util/context';
@@ -13,12 +13,12 @@ interface SigningKeyMap {
 }
 
 export interface TokenGeneratorOptions {
-    signingKey: Buffer;
-    asapJwtIss: string;
     asapJwtAud: string;
+    asapJwtIss: string;
     asapJwtKid: string;
     asapJwtSub?: string;
     cacheTTL?: number;
+    signingKey: Buffer;
     signingKeys?: SigningKeyMap;
 }
 
@@ -33,7 +33,7 @@ export default class TokenGenerator {
     private asapJwtKid: string;
     private asapJwtSub: string;
     private cacheTTL = 60 * 45;
-    private defaultSignOptions: SignOptions
+    private defaultSignOptions: SignOptions;
 
     /**
      * Constructor
@@ -62,7 +62,7 @@ export default class TokenGenerator {
             audience: this.asapJwtAud,
             issuer: this.asapJwtIss,
             keyid: this.asapJwtKid
-        }
+        };
 
         if (this.asapJwtSub) {
             this.defaultSignOptions.subject = this.asapJwtSub;

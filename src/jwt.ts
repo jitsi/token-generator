@@ -38,7 +38,7 @@ let token = '';
 let asapType = 'server';
 
 if (env.ASAP_TYPE) {
-    asapType = <string>env.ASAP_TYPE
+    asapType = <string>env.ASAP_TYPE;
 }
 
 const payload = <JwtPayload>{};
@@ -46,7 +46,7 @@ const payload = <JwtPayload>{};
 switch (asapType) {
 case 'server':
     if (env.ASAP_SCD) {
-        payload.scd = env.ASAP_SCD
+        payload.scd = env.ASAP_SCD;
     }
     token = tokenGenerator.serverToken(ctx, payload, {});
     break;

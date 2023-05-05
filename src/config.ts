@@ -22,7 +22,7 @@ if (result.error) {
 export interface AsapBaseUrlMapping {
     appendKidPrefix: boolean;
     baseUrl: string;
-    kid?: string,
+    kid?: string;
 }
 
 const env = envalid.cleanEnv(process.env, {

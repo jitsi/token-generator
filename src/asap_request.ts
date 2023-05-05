@@ -5,13 +5,13 @@ import NodeCache from 'node-cache';
 import { Context } from './util/context';
 
 export interface AsapRequestOptions {
-    signingKey: Buffer;
-    asapJwtIss: string;
     asapJwtAud: string;
+    asapJwtIss: string;
     asapJwtKid: string;
     cacheTTL?: number;
-    requestTimeoutMs?: number;
     requestRetryCount?: number;
+    requestTimeoutMs?: number;
+    signingKey: Buffer;
 }
 
 export interface OverrideableRequestOptions {
