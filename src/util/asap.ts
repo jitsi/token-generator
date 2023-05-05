@@ -1,7 +1,7 @@
 
 import express from 'express';
 import got from 'got';
-import { Jwt, Secret, JwtPayload } from 'jsonwebtoken';
+import { Jwt, JwtPayload, Secret } from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import sha256 from 'sha256';
 

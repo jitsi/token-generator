@@ -1,5 +1,5 @@
 import express from 'express';
-import { expressjwt, UnauthorizedError } from 'express-jwt';
+import { UnauthorizedError, expressjwt } from 'express-jwt';
 
 import { ASAPPubKeyFetcher } from '../util/asap';
 
@@ -9,10 +9,10 @@ export interface JwtClaims {
 }
 
 export interface TokenAuthorizationOptions {
-    asapFetcher: ASAPPubKeyFetcher,
-    protectedApi: boolean,
-    systemJwtClaims: JwtClaims,
-    jitsiJwtClaims: JwtClaims
+    asapFetcher: ASAPPubKeyFetcher;
+    jitsiJwtClaims: JwtClaims;
+    protectedApi: boolean;
+    systemJwtClaims: JwtClaims;
 }
 
 /**

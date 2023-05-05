@@ -46,19 +46,19 @@ class Handlers {
 
         const payload = <JwtPayload>{
             room: inputs.room ? inputs.room : '*'
-        }
+        };
 
         const signOptions = <SignOptions>{
             issuer: 'jaas-components',
             expiresIn: '1 day'
-        }
+        };
 
         if (inputs.tenant) {
             signOptions.subject = inputs.tenant;
         } else if (inputs.domain) {
             signOptions.subject = inputs.domain;
         } else {
-            signOptions.subject = '*'
+            signOptions.subject = '*';
         }
 
         switch (inputs.tokenType) {
@@ -88,7 +88,7 @@ class Handlers {
         let signOptions = <SignOptions>{
             audience: 'jitsi-token-generator',
             expiresIn: '1 hour'
-        }
+        };
 
         if (req.params) {
             signOptions = <SignOptions>{

@@ -24,11 +24,11 @@ for (const issuer of config.SystemAsapJwtAcceptedHookIss.values()) {
 const systemJwtClaims = {
     asapJwtAcceptedAud: config.SystemAsapJwtAcceptedAud,
     asapJwtAcceptedHookIss: config.SystemAsapJwtAcceptedHookIss
-}
+};
 const jitsiJwtClaims = {
     asapJwtAcceptedAud: config.SystemAsapJwtAcceptedAud,
     asapJwtAcceptedHookIss: config.SystemAsapJwtAcceptedHookIss
-}
+};
 
 const asapFetcher = new ASAPPubKeyFetcher(
     issToBaseUrlMapping,

@@ -2,20 +2,23 @@ module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
     env: {
-        node: true,
+        node: true
     },
     parserOptions: {
         ecmaVersion: 2020,
-        sourceType: "module",
+        sourceType: 'module'
     },
     plugins: [
-        '@typescript-eslint',
+        '@typescript-eslint'
     ],
     extends: [
-        '@jitsi/eslint-config',
-        '@jitsi/eslint-config/typescript'
+        '@jitsi/eslint-config'
     ],
-    "globals": {
-        "NodeJS": true
+    'globals': {
+        'NodeJS': true
     },
+    'rules': {
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'error'
+    }
 };
