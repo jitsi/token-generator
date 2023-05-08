@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z "$JWT_ENV_FILE" ] && JWT_ENV_FILE="/etc/jitsi/token-generator/generator.env"
+[ -z "$JWT_ENV_FILE" ] && JWT_ENV_FILE="/etc/jitsi/token-generator/config"
 
 if [ -f "$JWT_ENV_FILE" ]; then
   . "$JWT_ENV_FILE"

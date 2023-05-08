@@ -1,0 +1,16 @@
+Source: token-generator
+Maintainer: Jitsi Team <dev@jitsi.org>
+Uploaders: Emil Ivov <emcho@jitsi.org>, Damian Minkov <damencho@jitsi.org>
+Section: net
+Priority: optional
+Build-Depends: npm, dh-systemd, debhelper (>= 10)
+Standards-Version: 4.0.0
+Homepage: https://jitsi.org/meet
+Vcs-Browser: https://github.com/jitsi/token-generator
+Vcs-Git: https://github.com/jitsi/token-generator.git
+
+Package: token-generator
+Architecture: all
+Essential: no
+Depends: nodejs
+Description: token-generator generates jwt tokens used in the Jitsi ecosystem

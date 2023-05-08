@@ -1,6 +1,18 @@
 # token-generator
 Token Generator for all occasions
 
+# build
+```
+npm install
+npm run build
+```
+
+# start 
+Copy env.example to .env and fill in the required fields.
+```
+npm run start
+```
+
 # Generating RSA Keys
 
 First generate the private key with the following command:
