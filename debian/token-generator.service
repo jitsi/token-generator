@@ -1,0 +1,15 @@
+[Unit]
+Description=token-generator node system service
+
+[Service]
+EnvironmentFile=/etc/jitsi/token-generator/config
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node /usr/share/token-generator/app.js
+Type=simple
+User=token-generator
+Group=jitsi
+Restart=always
+SyslogIdentifier=token-generator
+
+[Install]
+WantedBy=multi-user.target

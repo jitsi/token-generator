@@ -1,0 +1,5 @@
+dist/*                       /usr/share/token-generator/
+node_modules                 /usr/share/token-generator/
+package.json                 /usr/share/token-generator/
+env.example                  /usr/share/token-generator/
+scripts/jwt.sh               /usr/share/token-generator/scripts/
