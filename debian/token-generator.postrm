@@ -24,6 +24,9 @@ set -e
 
 case "$1" in
     purge)
+        # Clear the debconf variables
+        db_purge
+
         CONFIG_DIR="/etc/jitsi/token-generator"
         rm -f ${CONFIG_DIR}/config
         rm -f ${CONFIG_DIR}/asap.key
