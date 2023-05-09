@@ -113,9 +113,9 @@ case "$1" in
             # We expose the public key via jitsi-meet
             JITSI_MEET_CONFIG_DIR="/etc/jitsi/meet";
             PUBLIC_KEYS_LOCATION="${JITSI_MEET_CONFIG_DIR}/public";
-            if [ -d $ASAP_SIGNING_KEY_FILE ] ; then
+            if [ -d $JITSI_MEET_CONFIG_DIR ] ; then
                 mkdir -p ${PUBLIC_KEYS_LOCATION}
-                PUB_KEY_NAME=$(echo -n ${SYSTEM_ASAP_KID} | sha256sum)
+                PUB_KEY_NAME=$(echo -n ${SYSTEM_ASAP_KID} | sha256sum | cut -f 1 -d " ")
                 ln -s ${ASAP_PUBLIC} "${PUBLIC_KEYS_LOCATION}/${PUB_KEY_NAME}.pem"
             fi
         fi
