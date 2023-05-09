@@ -55,8 +55,42 @@ case "$1" in
             chmod 750 "$CONFIG_DIR"
         fi
 
+        # loading debconf
+        . /usr/share/debconf/confmodule
+
+        # try to get host from jitsi-videobridge
+        db_get jitsi-videobridge/jvb-hostname
+        if [ -z "$RET" ] ; then
+            RET="jitsi-meet.example.com"
+            echo "Warning! Fallback to default jitsi-meet FQN:${RET}"
+        fi
+        JVB_HOSTNAME=$(echo "$RET" | xargs echo -n)
+
+        db_get token-generator/private-key || true
+        CUSTOM_PRIVATE_KEY=$RET
+
+        db_get token-generator/kid || true
+        CUSTOM_KID=$RET
+
         CURRENT_DATE=$(date '+%Y-%m-%d')
-        ASAP_KID="jitsi/jwt-${CURRENT_DATE}"
+        ASAP_JWT_KID="jitsi-meet/jwt-${CURRENT_DATE}"
+        CLIENT_SIGNING_KEY_FILE="${CONFIG_DIR}/client.key"
+
+        if [ -f ${CUSTOM_PRIVATE_KEY} ] && [ ! -z "${CUSTOM_KID}" ]; then
+            echo "Processing supplied arguments! Copying private key ${CUSTOM_PRIVATE_KEY} to ${CONFIG_DIR}."
+            cp ${CUSTOM_PRIVATE_KEY} ${CLIENT_SIGNING_KEY_FILE}
+            chown token-generator:$GROUP ${CLIENT_SIGNING_KEY_FILE}
+            ASAP_JWT_KID="${CUSTOM_KID}"
+
+            # Let's reset the values so we don't get them on next update
+            db_reset token-generator/private-key
+            db_reset token-generator/kid
+        fi
+
+        # and we're done with debconf
+        db_stop
+
+        SYSTEM_ASAP_KID="jitsi/jwt-${CURRENT_DATE}"
 
         ASAP_SIGNING_KEY_FILE="${CONFIG_DIR}/asap.key"
         ASAP_PUBLIC="${CONFIG_DIR}/asap.pem"
@@ -81,12 +115,11 @@ case "$1" in
             PUBLIC_KEYS_LOCATION="${JITSI_MEET_CONFIG_DIR}/public";
             if [ -d $ASAP_SIGNING_KEY_FILE ] ; then
                 mkdir -p ${PUBLIC_KEYS_LOCATION}
-                PUB_KEY_NAME=$(echo -n ${ASAP_KID} | sha256sum)
+                PUB_KEY_NAME=$(echo -n ${SYSTEM_ASAP_KID} | sha256sum)
                 ln -s ${ASAP_PUBLIC} "${PUBLIC_KEYS_LOCATION}/${PUB_KEY_NAME}.pem"
             fi
         fi
 
-        CLIENT_SIGNING_KEY_FILE="${CONFIG_DIR}/client.key"
         CLIENT_PUBLIC="${CONFIG_DIR}/client.pem"
         # let's generate key pair for the generation of the client tokens
         if [ ! -f $CLIENT_SIGNING_KEY_FILE ] ; then
@@ -100,26 +133,12 @@ case "$1" in
             chown token-generator:$GROUP "$CONFIG_DIR"/*
         fi
 
-        # loading debconf
-        . /usr/share/debconf/confmodule
-
-        # try to get host from jitsi-videobridge
-        db_get jitsi-videobridge/jvb-hostname
-        if [ -z "$RET" ] ; then
-            RET="jitsi-meet.example.com"
-            echo "Warning! Fallback to default jitsi-meet FQN:${RET}"
-        fi
-        JVB_HOSTNAME=$(echo "$RET" | xargs echo -n)
-
-        # and we're done with debconf
-        db_stop
-
         TOKEN_CONFIG="${CONFIG_DIR}/config"
         if [ ! -f $TOKEN_CONFIG ] ; then
             cp /usr/share/token-generator/env.example $TOKEN_CONFIG
-            sed -i s#ASAP_JWT_KID=#ASAP_JWT_KID=\"jitsi-meet/jwt-${CURRENT_DATE}\"#g $TOKEN_CONFIG
+            sed -i s#ASAP_JWT_KID=#ASAP_JWT_KID=\"${ASAP_JWT_KID}\"#g $TOKEN_CONFIG
             sed -i s#ASAP_SIGNING_KEY_FILE=#ASAP_SIGNING_KEY_FILE=${CLIENT_SIGNING_KEY_FILE}#g $TOKEN_CONFIG
-            sed -i s#SYSTEM_ASAP_BASE_URL_MAPPINGS=#SYSTEM_ASAP_BASE_URL_MAPPINGS=[\{\"kid\":\"${ASAP_KID}\",\"baseUrl\":\"https://${JVB_HOSTNAME}/_api/public\"\}]#g $TOKEN_CONFIG
+            sed -i s#SYSTEM_ASAP_BASE_URL_MAPPINGS=#SYSTEM_ASAP_BASE_URL_MAPPINGS=[\{\"kid\":\"${SYSTEM_ASAP_KID}\",\"baseUrl\":\"https://${JVB_HOSTNAME}/_api/public\"\}]#g $TOKEN_CONFIG
             sed -i s/SYSTEM_ASAP_JWT_ACCEPTED_HOOK_ISS=/SYSTEM_ASAP_JWT_ACCEPTED_HOOK_ISS=\"jitsi-token-generator\"/g $TOKEN_CONFIG
             sed -i s/SYSTEM_ASAP_JWT_AUD=/SYSTEM_ASAP_JWT_AUD=\"jitsi\"/g $TOKEN_CONFIG
         fi
