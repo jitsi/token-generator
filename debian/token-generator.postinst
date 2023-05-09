@@ -52,7 +52,7 @@ case "$1" in
 
         if ! dpkg-statoverride --list "$CONFIG_DIR" >/dev/null; then
             chown token-generator:$GROUP "$CONFIG_DIR"
-            chmod 750 "$CONFIG_DIR"
+            chmod 755 "$CONFIG_DIR"
         fi
 
         # loading debconf
@@ -79,6 +79,7 @@ case "$1" in
         if [ -f ${CUSTOM_PRIVATE_KEY} ] && [ ! -z "${CUSTOM_KID}" ]; then
             echo "Processing supplied arguments! Copying private key ${CUSTOM_PRIVATE_KEY} to ${CONFIG_DIR}."
             cp ${CUSTOM_PRIVATE_KEY} ${CLIENT_SIGNING_KEY_FILE}
+            chmod 600 ${CLIENT_SIGNING_KEY_FILE}
             chown token-generator:$GROUP ${CLIENT_SIGNING_KEY_FILE}
             ASAP_JWT_KID="${CUSTOM_KID}"
 
