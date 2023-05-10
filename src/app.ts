@@ -77,6 +77,13 @@ app.use(unless(generatorAuthorization.systemAuthMiddleware, ...noSystemAuthPaths
 // This is placed last in the middleware chain and is our default error handler.
 app.use(errorHandler.errorHandlerMiddleware);
 
+app.get('/generate/client', async (req: Request, res: Response, next) => {
+    try {
+        await handlers.generateClientToken(req, res);
+    } catch (err) {
+        next(err);
+    }
+});
 
 app.get('/generate/component', async (req: Request, res: Response, next) => {
     try {
@@ -93,6 +100,15 @@ app.get('/generate/server', async (req: Request, res: Response, next) => {
         next(err);
     }
 });
+
+app.post('/generate/client', async (req: Request, res: Response, next) => {
+    try {
+        await handlers.generateClientToken(req, res);
+    } catch (err) {
+        next(err);
+    }
+});
+
 app.post('/generate/component', async (req: Request, res: Response, next) => {
     try {
         await handlers.generateComponentToken(req, res);

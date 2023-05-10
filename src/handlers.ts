@@ -108,6 +108,47 @@ class Handlers {
 
     }
 
+    /**
+     * Generates a client token valid for 2 hours. The token structure is taken from the body of the reques.
+     * @param req Request
+     * @param res Response
+     * @returns A json with token and tenant (extracted from the token body field sub).
+     */
+    async generateClientToken(req: Request, res: Response) {
+        const inputs = {
+            ...req.body,
+            ...req.params,
+            ...req.query
+        };
+
+        req.context.logger.debug('inputs', { inputs,
+            method: req.method,
+            body: req.body,
+            params: req.params });
+
+        const payload = <JwtPayload>{
+            ...req.body
+        };
+
+        const signOptions = <SignOptions>{
+            audience: 'jitsi',
+            issuer: 'chat',
+            expiresIn: '2 hour'
+        };
+
+        const token = this.tokenGenerator.clientToken(
+            req.context,
+            payload,
+            signOptions
+        );
+
+        const tenant = inputs.sub;
+
+        res.status(200).json({
+            token,
+            tenant
+        });
+    }
 }
 
 export default Handlers;
