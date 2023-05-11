@@ -2,7 +2,7 @@
 import * as dotenv from 'dotenv';
 import envalid from 'envalid';
 import fs from 'fs';
-import { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload, SignOptions } from 'jsonwebtoken';
 
 import logger from './logger';
 import TokenGenerator from './token_generator';
@@ -11,6 +11,7 @@ import { Context } from './util/context';
 dotenv.config();
 
 const env = envalid.cleanEnv(process.env, {
+    ASAP_EXPIRES_IN: envalid.str({ default: '' }),
     ASAP_JWT_ISS: envalid.str({ default: 'jitsi-token-generator' }),
     ASAP_JWT_AUD: envalid.str({ default: 'jitsi' }),
     ASAP_SIGNING_KEY_FILE: envalid.str(),
@@ -44,12 +45,20 @@ if (env.ASAP_TYPE) {
 const payload = <JwtPayload>{};
 
 switch (asapType) {
-case 'server':
+case 'server': {
     if (env.ASAP_SCD) {
         payload.scd = env.ASAP_SCD;
     }
-    token = tokenGenerator.serverToken(ctx, payload, {});
+
+    const signOptions: SignOptions = {};
+
+    if (env.ASAP_EXPIRES_IN) {
+        signOptions.expiresIn = env.ASAP_EXPIRES_IN;
+    }
+
+    token = tokenGenerator.serverToken(ctx, payload, signOptions);
     break;
+}
 case 'client':
     token = tokenGenerator.clientToken(ctx, { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
     break;
