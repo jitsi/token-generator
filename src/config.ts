@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv';
 import envalid from 'envalid';
 
+const crypto = require('crypto');
+
 const result = dotenv.config();
 
 if (result.error) {
@@ -14,6 +16,14 @@ if (result.error) {
     default:
         throw result.error;
     }
+}
+
+/**
+ * Converts a string to Uint8Array.
+ * @param str
+ */
+function asciiToUint8Array([ ...str ]) {
+    return new Uint8Array(str.map(char => char.charCodeAt(0)));
 }
 
 /**
@@ -33,6 +43,7 @@ const env = envalid.cleanEnv(process.env, {
     ASAP_PUB_KEY_TTL: envalid.num({ default: 3600 }),
     ASAP_SIGNING_KEY_FILE: envalid.str(),
     HOSTNAME: envalid.str({ default: '' }),
+    KEY_GEN_SALT: envalid.str({ default: crypto.randomBytes(16).toString('hex') }),
     KEY_PREFIX_PATTERN: envalid.str({ default: '^(.*)/(.*)$' }),
     LOG_LEVEL: envalid.str({ default: 'info' }),
     PORT: envalid.num({ default: 8017 }),
@@ -56,6 +67,7 @@ export default {
     AsapSigningKeyFile: env.ASAP_SIGNING_KEY_FILE,
     HTTPServerPort: env.PORT,
     Hostname: env.HOSTNAME,
+    KeyGenSalt: asciiToUint8Array(env.KEY_GEN_SALT),
     KidPrefixPattern: env.KEY_PREFIX_PATTERN,
     LogLevel: env.LOG_LEVEL,
     ProtectedApi: env.PROTECTED_API,

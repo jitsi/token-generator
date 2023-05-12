@@ -2,8 +2,12 @@ import { Request, Response } from 'express';
 import { JwtPayload, SignOptions } from 'jsonwebtoken';
 
 import TokenGenerator from './token_generator';
+
+const crypto = require('crypto').webcrypto;
+
 interface HandlersOptions {
     tokenGenerator: TokenGenerator;
+    salt: Uint8Array
 }
 
 /**
@@ -11,6 +15,7 @@ interface HandlersOptions {
  */
 class Handlers {
     private tokenGenerator: TokenGenerator;
+    private salt: Uint8Array;
 
     /**
      *
@@ -19,6 +24,7 @@ class Handlers {
     constructor(options: HandlersOptions) {
 
         this.tokenGenerator = options.tokenGenerator;
+        this.salt = options.salt;
     }
 
     /**
@@ -142,11 +148,47 @@ class Handlers {
             signOptions
         );
 
+        let e2eeKey: string;
+
+        if (inputs.e2eeKey === 'true') {
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                payload.room,
+                'PBKDF2',
+                false,
+                [ 'deriveBits', 'deriveKey' ]
+            );
+
+            const dk = await crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: this.salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                {
+                    name: 'AES-GCM',
+                    length: 128
+                },
+                true,
+                [ 'encrypt', 'decrypt' ]
+            );
+
+            const toHexString = (bytes: ArrayBuffer) =>
+                Array.from(new Uint8Array(bytes), (byte: number) =>
+                    // eslint-disable-next-line no-bitwise
+                    `0${(byte & 0xff).toString(16)}`.slice(-2)).join('');
+
+            e2eeKey = toHexString(await crypto.subtle.exportKey('raw', dk));
+        }
+
         const tenant = inputs.sub;
 
         res.status(200).json({
             token,
-            tenant
+            tenant,
+            e2eeKey
         });
     }
 }
