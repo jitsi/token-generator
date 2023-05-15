@@ -53,7 +53,10 @@ const tokenGenerator = new TokenGenerator({
     asapJwtSub: config.AsapJwtSub
 });
 
-const handlers = new Handlers({ tokenGenerator });
+const handlers = new Handlers({
+    tokenGenerator,
+    salt: config.KeyGenSalt
+});
 
 const app = express();
 
