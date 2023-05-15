@@ -156,7 +156,7 @@ class Handlers {
                 payload.room,
                 'PBKDF2',
                 false,
-                [ 'deriveBits', 'deriveKey' ]
+                [ 'deriveKey' ]
             );
 
             const dk = await crypto.subtle.deriveKey(
