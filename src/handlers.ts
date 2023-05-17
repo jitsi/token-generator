@@ -2,8 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload, SignOptions } from 'jsonwebtoken';
 
 import TokenGenerator from './token_generator';
-
-const crypto = require('crypto').webcrypto;
+import { generateKey } from './util/crypto_helper';
 
 interface HandlersOptions {
     tokenGenerator: TokenGenerator;
@@ -142,6 +141,15 @@ class Handlers {
             expiresIn: '2 hour'
         };
 
+        const originalRoomName = payload.room;
+        const tenant = inputs.sub;
+        let confId: string;
+
+        if (inputs.confId === 'true') {
+            confId = await generateKey(`${tenant}/${originalRoomName}`, this.salt);
+            payload.room = confId;
+        }
+
         const token = this.tokenGenerator.clientToken(
             req.context,
             payload,
@@ -151,41 +159,11 @@ class Handlers {
         let e2eeKey: string;
 
         if (inputs.e2eeKey === 'true') {
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                payload.room,
-                'PBKDF2',
-                false,
-                [ 'deriveKey' ]
-            );
-
-            const dk = await crypto.subtle.deriveKey(
-                {
-                    name: 'PBKDF2',
-                    salt: this.salt,
-                    iterations: 100000,
-                    hash: 'SHA-256'
-                },
-                keyMaterial,
-                {
-                    name: 'AES-GCM',
-                    length: 128
-                },
-                true,
-                [ 'encrypt', 'decrypt' ]
-            );
-
-            const toHexString = (bytes: ArrayBuffer) =>
-                Array.from(new Uint8Array(bytes), (byte: number) =>
-                    // eslint-disable-next-line no-bitwise
-                    `0${(byte & 0xff).toString(16)}`.slice(-2)).join('');
-
-            e2eeKey = toHexString(await crypto.subtle.exportKey('raw', dk));
+            e2eeKey = await generateKey(originalRoomName, this.salt);
         }
 
-        const tenant = inputs.sub;
-
         res.status(200).json({
+            confId,
             token,
             tenant,
             e2eeKey
