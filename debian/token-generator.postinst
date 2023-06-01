@@ -66,26 +66,33 @@ case "$1" in
         fi
         JVB_HOSTNAME=$(echo "$RET" | xargs echo -n)
 
-        db_get token-generator/private-key || true
-        CUSTOM_PRIVATE_KEY=$RET
+        EXIT_CODE=0
+        CUSTOM_PRIVATE_KEY=""
+        db_get token-generator/private-key || EXIT_CODE=$?
+        if [ ${EXIT_CODE} = 0 ] then
+            CUSTOM_PRIVATE_KEY="$RET"
+            # Let's reset the values so we don't get them on next update
+            db_reset token-generator/private-key
+        fi
 
-        db_get token-generator/kid || true
-        CUSTOM_KID=$RET
+        EXIT_CODE=0
+        CUSTOM_KID=""
+        db_get token-generator/kid || EXIT_CODE=$?
+        if [ ${EXIT_CODE} = 0 ] then
+            CUSTOM_KID="$RET"
+            db_reset token-generator/kid
+        fi
 
         CURRENT_DATE=$(date '+%Y-%m-%d')
         ASAP_JWT_KID="jitsi-meet/jwt-${CURRENT_DATE}"
         CLIENT_SIGNING_KEY_FILE="${CONFIG_DIR}/client.key"
 
-        if [ -f ${CUSTOM_PRIVATE_KEY} ] && [ ! -z "${CUSTOM_KID}" ]; then
+        if [ ! -z ${CUSTOM_PRIVATE_KEY} ] && [ -f ${CUSTOM_PRIVATE_KEY} ] && [ ! -z "${CUSTOM_KID}" ]; then
             echo "Processing supplied arguments! Copying private key ${CUSTOM_PRIVATE_KEY} to ${CONFIG_DIR}."
             cp ${CUSTOM_PRIVATE_KEY} ${CLIENT_SIGNING_KEY_FILE}
             chmod 600 ${CLIENT_SIGNING_KEY_FILE}
             chown token-generator:$GROUP ${CLIENT_SIGNING_KEY_FILE}
             ASAP_JWT_KID="${CUSTOM_KID}"
-
-            # Let's reset the values so we don't get them on next update
-            db_reset token-generator/private-key
-            db_reset token-generator/kid
         fi
 
         # and we're done with debconf
