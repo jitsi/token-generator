@@ -63,7 +63,9 @@ case 'server': {
 case 'client':
     token = tokenGenerator.clientToken(ctx, {
         ...payload,
-        room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
+        room: env.ASAP_ROOM ? env.ASAP_ROOM : '*'
+    },
+    { expiresIn: env.ASAP_EXPIRES_IN ? env.ASAP_EXPIRES_IN : '1 day' });
     break;
 case 'component':
     token = tokenGenerator.clientToken(ctx,
