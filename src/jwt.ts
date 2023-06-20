@@ -19,6 +19,7 @@ const env = envalid.cleanEnv(process.env, {
     ASAP_TYPE: envalid.str({ default: '' }),
     ASAP_JWT_SUB: envalid.str({ default: undefined }),
     ASAP_ROOM: envalid.str({ default: '' }),
+    ASAP_PAYLOAD: envalid.json({ default: undefined }),
     ASAP_SCD: envalid.str({ default: undefined }) // cluster scope domain
 });
 
@@ -42,7 +43,7 @@ if (env.ASAP_TYPE) {
     asapType = <string>env.ASAP_TYPE;
 }
 
-const payload = <JwtPayload>{};
+const payload = env.ASAP_PAYLOAD ? <JwtPayload>env.ASAP_PAYLOAD : <JwtPayload>{};
 
 switch (asapType) {
 case 'server': {
@@ -60,7 +61,9 @@ case 'server': {
     break;
 }
 case 'client':
-    token = tokenGenerator.clientToken(ctx, { room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
+    token = tokenGenerator.clientToken(ctx, {
+        ...payload,
+        room: env.ASAP_ROOM ? env.ASAP_ROOM : '*' }, { expiresIn: '1 day' });
     break;
 case 'component':
     token = tokenGenerator.clientToken(ctx,
