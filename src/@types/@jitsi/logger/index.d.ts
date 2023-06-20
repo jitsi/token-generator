@@ -14,5 +14,6 @@ declare module '@jitsi/logger' {
     }
 
     export function getUntrackedLogger(id: string, transports: Array<Object> | undefined, config: Object): Logger;
+    export function setLogLevel(level: string): void;
 }
 
