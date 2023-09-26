@@ -8,7 +8,7 @@ const crypto = require('crypto').webcrypto;
 export async function generateKey(value: string, salt: Uint8Array) {
     const keyMaterial = await crypto.subtle.importKey(
         'raw',
-        value,
+        Buffer.from(value, 'utf8'),
         'PBKDF2',
         false,
         [ 'deriveKey' ]
